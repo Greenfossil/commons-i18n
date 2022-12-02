@@ -2,7 +2,7 @@ name := "commons-i18n"
 
 organization := "com.greenfossil"
 
-version := "0.1.0-SNAPSHOT"
+version := "1.0.0-SNAPSHOT"
 
 scalaVersion := "3.2.0"
 
@@ -10,7 +10,7 @@ scalacOptions ++= Seq("-unchecked", "-feature", "-deprecation")
 
 Compile / javacOptions ++= Seq("-source", "17")
 
-lazy val configExtVersion = "0.1.0"
+lazy val configExtVersion = "1.0.0"
 
 lazy val commonsI18n = project in file(".")
 
