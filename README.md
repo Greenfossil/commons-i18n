@@ -61,14 +61,17 @@ You can specify additional properties file in your application. A properties fil
 You can access this translation by invoking either of these 2 methods
 
 ```scala
+import java.util.Locale
+given Locale = Locale.getDefault()
+
 // The value will be retrieve in the properties file according to the key defined
-i18n(key: String)
+i18n("library.title")
 
 // Default value will be shown if key does not exist
-i18nWithDefault(key: String, defaultValue: String)
+i18nWithDefault("library.title","My Library")
 ```
 
-You can configure some translation according to the locale set
+Configure some translation according to the locale set
 
 ```
 app.i18n.langs = ["en", "zh", "my"] # Note: `en` is already defined by default
