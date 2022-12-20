@@ -1,6 +1,6 @@
 # commons-i18n 
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/Greenfossil/commons-i18n/Run%20tests)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/Greenfossil/commons-i18n/run-tests.yml?branch=master)
 ![](https://img.shields.io/github/license/Greenfossil/commons-i18n)
 ![](https://img.shields.io/github/v/tag/Greenfossil/commons-i18n)
 
