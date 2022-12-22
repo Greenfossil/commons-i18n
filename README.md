@@ -3,6 +3,8 @@
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/Greenfossil/commons-i18n/run-tests.yml?branch=master)
 ![](https://img.shields.io/github/license/Greenfossil/commons-i18n)
 ![](https://img.shields.io/github/v/tag/Greenfossil/commons-i18n)
+![Maven Central](https://img.shields.io/maven-central/v/com.greenfossil/commons-i18n_3)
+[![javadoc](https://javadoc.io/badge2/com.greenfossil/commons-i18n_3/javadoc.svg)](https://javadoc.io/doc/com.greenfossil/commons-i18n_3)
 
 This is the official Greenfossil Scala library for internationalization and localization.
 
