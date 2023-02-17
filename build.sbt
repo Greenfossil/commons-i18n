@@ -2,9 +2,9 @@ name := "commons-i18n"
 
 organization := "com.greenfossil"
 
-version := "1.0.0"
+version := "1.0.1"
 
-scalaVersion := "3.2.0"
+scalaVersion := "3.2.2"
 
 scalacOptions ++= Seq("-unchecked", "-feature", "-deprecation")
 

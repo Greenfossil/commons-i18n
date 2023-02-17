@@ -34,10 +34,12 @@ trait LocaleUtil:
 
   /**
    * Get best matched locale from the accepted language ranges and available locales.
+   * If there is no language matched the available locale, it will return the first locale of the list.
    */
   def getBestMatchLocale(acceptedLanguageRanges: Seq[LanguageRange], availableLocales: Seq[Locale], variantOpt: Option[String]): Locale =
     import scala.jdk.CollectionConverters.*
-    val bestMatchLocale = Option(Locale.lookup(acceptedLanguageRanges.asJava, availableLocales.asJava)).getOrElse(Locale.getDefault)
+    val bestMatchLocale = Option(Locale.lookup(acceptedLanguageRanges.asJava, availableLocales.asJava))
+      .orElse(availableLocales.headOption).getOrElse(Locale.getDefault)
     new Builder().setLocale(bestMatchLocale).setVariant(variantOpt.getOrElse("")).build()
 
 object LocaleUtil extends LocaleUtil

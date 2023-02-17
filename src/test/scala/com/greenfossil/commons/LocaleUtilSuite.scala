@@ -48,4 +48,12 @@ class LocaleUtilSuite extends FunSuite{
     assertEquals(bestMatch, new Locale("en", "SG", "elemx"))
   }
 
+  test("Get best match where language tag has no match with available languages") {
+    val acceptedLanguages = LanguageRange.parse("zh-CN").asScala.toList
+    val availableLanguageTags = Seq("en-SG")
+
+    val bestMatch = LocaleUtil.getBestMatchFromLanguageTags(acceptedLanguages, availableLanguageTags, Some("elemx"))
+    assertEquals(bestMatch, new Locale("en", "SG", "elemx"))
+  }
+
 }
