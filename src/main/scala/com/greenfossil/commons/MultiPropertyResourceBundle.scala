@@ -71,8 +71,6 @@ case class MultiPropertyResourceBundle(baseNames: String*):
             else
               val value = bundle.getString(key)
               new java.text.MessageFormat(value, locale).format(args.toArray)
-            val value = bundle.getString(key)
-            new java.text.MessageFormat(value, locale).format(args.toArray)
           }.toOption.tap { opt =>
             I18nLogger.debug(s"path:${url.getPath} - key/value $key:$opt")
           }
