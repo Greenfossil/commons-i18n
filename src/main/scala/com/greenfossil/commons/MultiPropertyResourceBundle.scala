@@ -16,6 +16,8 @@
 
 package com.greenfossil.commons
 
+import com.typesafe.config.*
+
 import java.net.URL
 import java.util.{Locale, PropertyResourceBundle, ResourceBundle}
 import scala.util.{Try, Using}
@@ -24,6 +26,11 @@ import scala.util.chaining.scalaUtilChainingOps
 case class MultiPropertyResourceBundle(baseNames: String*):
 
   import scala.jdk.CollectionConverters.*
+
+  /**
+    * Feature to retrieve and show the key beside the value if enabled
+    */
+  lazy val SHOWI18NKEYS: Boolean = DefaultConfig().getBooleanOpt("app.i18n.showI18nKeys").getOrElse(false)
 
   private val control = ResourceBundle.Control.getControl(ResourceBundle.Control.FORMAT_PROPERTIES)
 
@@ -58,6 +65,12 @@ case class MultiPropertyResourceBundle(baseNames: String*):
       tup2List.flatMap {
         case (url, bundle) =>
           Try {
+            if SHOWI18NKEYS then
+              val value = bundle.getString(key)
+              new java.text.MessageFormat(s"$value [$key]", locale).format(args.toArray)
+            else
+              val value = bundle.getString(key)
+              new java.text.MessageFormat(value, locale).format(args.toArray)
             val value = bundle.getString(key)
             new java.text.MessageFormat(value, locale).format(args.toArray)
           }.toOption.tap { opt =>
