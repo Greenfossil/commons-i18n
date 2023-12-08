@@ -62,13 +62,13 @@ case class MultiPropertyResourceBundle(baseNames: String*):
   def i18nWithDefault(key: String, defaultValue: String, args: Any*)(using locale: Locale | LocaleProvider): String =
     i18nWithDefault((msg, key, locale) => msg, key, defaultValue, args*)
 
-  def i18nWithDefault(messageFn: (String, String, Locale) => String, key: String, defaultValue: String, args: Any*)(using locale: Locale | LocaleProvider): String =
+  def i18nWithDefault(messageFn: (String, String, Locale | LocaleProvider) => String, key: String, defaultValue: String, args: Any*)(using localeLike: Locale | LocaleProvider): String =
     getBundles.flatMap { case (locale, tup2List) =>
       tup2List.flatMap {
         case (url, bundle) =>
           Try {
             val resourceBundleMessage = bundle.getString(key)
-            val message = messageFn(resourceBundleMessage, key, locale)
+            val message = messageFn(resourceBundleMessage, key, localeLike)
             new java.text.MessageFormat(message, locale).format(args.toArray)
           }.toOption.tap { opt =>
             I18nLogger.debug(s"path:${url.getPath} - key/value $key:$opt")
