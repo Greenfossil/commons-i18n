@@ -26,13 +26,16 @@ private [commons] val I18nLogger = LoggerFactory.getLogger("com.greenfossil.comm
 
 trait I18nSupport:
 
+  type LocaleLike = Locale | LocaleProvider
+
   /**
     * I18NFILENAME can be a list of basenames either comma or space separated
     */
   lazy val I18NFILENAME: String = DefaultConfig().getStringOpt("app.i18n.resourcebundle.basename").getOrElse("messages")
 
+  lazy val bundle = MultiPropertyResourceBundle(I18NFILENAME.split("\\s*,\\s*|\\s+") *)
 
-  lazy val bundle = MultiPropertyResourceBundle(I18NFILENAME.split("\\s*,\\s*|\\s+")*)
+  def i18nMessageFn(message: String, key: String, localeLike: LocaleLike): String = message
 
   /**
     * Search of the key is based on the order or baseNames.
@@ -59,14 +62,14 @@ trait I18nSupport:
     * @returnIf key is not found, returns defaultValue
     */
   inline def i18nWithDefault(key: String, defaultValue: String, args: Any*): String =
-    bundle.i18nWithDefault(key, defaultValue, args*)(using summonLocale)
+    bundle.i18nWithDefault(i18nMessageFn, key, defaultValue, args*)(using summonLocale)
 
   inline def i18n(keys: Seq[String], args: Any*): String =
-    val locale = summonLocale
+    val localeLike = summonLocale
     (
       for {
         key <- keys
-      } yield bundle.i18nWithDefault(key, key, args *)(using locale)
+      } yield bundle.i18nWithDefault(i18nMessageFn, key, key, args *)(using localeLike)
       ).mkString(",")
 
   /**
@@ -74,7 +77,7 @@ trait I18nSupport:
     * @param locale
     * @return - a seq of resource bundles based on the search order of key
     */
-  inline def dumpBundles: Seq[(Locale, Seq[(URL, PropertyResourceBundle)])] =
+  inline def dumpBundles: Seq[(LocaleLike, Seq[(URL, PropertyResourceBundle)])] =
     bundle.dumpBundles(using summonLocale)
 
   /**

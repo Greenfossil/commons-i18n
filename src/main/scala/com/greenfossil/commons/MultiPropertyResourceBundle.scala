@@ -23,14 +23,13 @@ import java.util.{Locale, PropertyResourceBundle, ResourceBundle}
 import scala.util.{Try, Using}
 import scala.util.chaining.scalaUtilChainingOps
 
+/**
+ * 
+ * @param baseNames
+ */
 case class MultiPropertyResourceBundle(baseNames: String*):
 
   import scala.jdk.CollectionConverters.*
-
-  /**
-    * Feature to retrieve and show the key beside the value if enabled
-    */
-  lazy val SHOWI18NKEYS: Boolean = DefaultConfig().getBooleanOpt("app.i18n.showI18nKeys").getOrElse(false)
 
   private val control = ResourceBundle.Control.getControl(ResourceBundle.Control.FORMAT_PROPERTIES)
 
@@ -60,17 +59,17 @@ case class MultiPropertyResourceBundle(baseNames: String*):
     * @param locale
     * @returnIf key is not found, returns defaultValue
     */
-  def i18nWithDefault(key: String, defaultValue: String, args: Any*)(using locale: Locale): String =
+  def i18nWithDefault(key: String, defaultValue: String, args: Any*)(using locale: Locale | LocaleProvider): String =
+    i18nWithDefault((msg, key, locale) => msg, key, defaultValue, args*)
+
+  def i18nWithDefault(messageFn: (String, String, Locale | LocaleProvider) => String, key: String, defaultValue: String, args: Any*)(using localeLike: Locale | LocaleProvider): String =
     getBundles.flatMap { case (locale, tup2List) =>
       tup2List.flatMap {
         case (url, bundle) =>
           Try {
-            if SHOWI18NKEYS then
-              val value = bundle.getString(key)
-              new java.text.MessageFormat(s"$value [$key]", locale).format(args.toArray)
-            else
-              val value = bundle.getString(key)
-              new java.text.MessageFormat(value, locale).format(args.toArray)
+            val resourceBundleMessage = bundle.getString(key)
+            val message = messageFn(resourceBundleMessage, key, localeLike)
+            new java.text.MessageFormat(message, locale).format(args.toArray)
           }.toOption.tap { opt =>
             I18nLogger.debug(s"path:${url.getPath} - key/value $key:$opt")
           }
@@ -81,9 +80,11 @@ case class MultiPropertyResourceBundle(baseNames: String*):
     * @param locale
     * @return - a seq of resource bundles based on the search order of key
     */
-  private def getBundles(using locale: Locale): Seq[(Locale, Seq[(URL, PropertyResourceBundle)])] =
+  private def getBundles(using localeLike: Locale | LocaleProvider): Seq[(Locale, Seq[(URL, PropertyResourceBundle)])] =
     Try {
-      val candidateLocales = control.getCandidateLocales("", locale).asScala
+      val candidateLocales = localeLike match
+        case locale: Locale => control.getCandidateLocales("", locale).asScala
+        case provider: LocaleProvider => control.getCandidateLocales("", provider.locale).asScala
 
       val resourceURLsGroupByLocale = candidateLocales.map { candidateLocale =>
         candidateLocale -> baseNames.flatMap { name =>
@@ -118,10 +119,10 @@ case class MultiPropertyResourceBundle(baseNames: String*):
   /**
     * Dumps the resource bundles bases on the locale
     *
-    * @param locale
+    * @param localeLike
     * @return - a seq of resource bundles based on the search order of key
     */
-  def dumpBundles(using locale: Locale): Seq[(Locale, Seq[(URL, PropertyResourceBundle)])] = {
+  def dumpBundles(using localeLike: Locale | LocaleProvider): Seq[(Locale, Seq[(URL, PropertyResourceBundle)])] = {
     val bundles = getBundles
     bundles.foreach {
       case (l, xs) =>
