@@ -31,9 +31,9 @@ trait I18nSupport:
     */
   lazy val I18NFILENAME: String = DefaultConfig().getStringOpt("app.i18n.resourcebundle.basename").getOrElse("messages")
 
-  lazy val bundle = MultiPropertyResourceBundle(i18nMessageFn, I18NFILENAME.split("\\s*,\\s*|\\s+") *)
+  lazy val bundle = MultiPropertyResourceBundle(I18NFILENAME.split("\\s*,\\s*|\\s+") *)
 
-  def i18nMessageFn(message: String, key: String, locale:Locale) = message
+  def i18nMessageFn(message: String, key: String, localeLike :Locale | LocaleProvider): String = message
 
   /**
     * Search of the key is based on the order or baseNames.
@@ -75,7 +75,7 @@ trait I18nSupport:
     * @param locale
     * @return - a seq of resource bundles based on the search order of key
     */
-  inline def dumpBundles: Seq[(Locale, Seq[(URL, PropertyResourceBundle)])] =
+  inline def dumpBundles: Seq[(Locale | LocaleProvider, Seq[(URL, PropertyResourceBundle)])] =
     bundle.dumpBundles(using summonLocale)
 
   /**
