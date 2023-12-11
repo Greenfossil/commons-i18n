@@ -2,7 +2,7 @@ name := "commons-i18n"
 
 organization := "com.greenfossil"
 
-version := "1.0.5"
+version := "1.0.6-RC1"
 
 scalaVersion := "3.3.0"
 

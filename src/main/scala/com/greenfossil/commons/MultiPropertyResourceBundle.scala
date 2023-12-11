@@ -19,6 +19,7 @@ package com.greenfossil.commons
 import com.typesafe.config.*
 
 import java.net.URL
+import java.nio.file.Paths
 import java.util.{Locale, PropertyResourceBundle, ResourceBundle}
 import scala.util.{Try, Using}
 import scala.util.chaining.scalaUtilChainingOps
@@ -89,8 +90,15 @@ case class MultiPropertyResourceBundle(baseNames: String*):
       val resourceURLsGroupByLocale = candidateLocales.map { candidateLocale =>
         candidateLocale -> baseNames.flatMap { name =>
           val bundleName = name + (if (candidateLocale.toString.isEmpty) ".properties" else "_" + candidateLocale.toString + ".properties")
-          val classLoader = Option(Thread.currentThread().getContextClassLoader).getOrElse(ClassLoader.getSystemClassLoader)
-          val urls = classLoader.getResources(bundleName).asScala.toSeq
+          
+          // Allow customization of .properties files
+          val urls =
+            if name.contains("/") then
+              Try(Paths.get(bundleName).toFile).filter(_.exists()).map(f => List(f.toURI.toURL)).getOrElse(Nil)
+            else
+              val classLoader = Option(Thread.currentThread().getContextClassLoader).getOrElse(ClassLoader.getSystemClassLoader)
+              classLoader.getResources(bundleName).asScala.toSeq
+          
           I18nLogger.debug(s"basename-locale = ${name} - [$candidateLocale], bundle=$bundleName, urls.size = ${urls.size}")
           urls
         }
