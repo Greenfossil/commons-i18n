@@ -16,23 +16,8 @@
 
 package com.greenfossil.commons
 
-import scala.compiletime.summonFrom
 import java.util.Locale
 
-
-inline def summonLocale: Locale | LocaleProvider =
-/*
- * Provider Locale has higher priority
- */
-  summonFrom {
-    case provider: LocaleProvider =>
-      I18nLogger.debug(s"Using provider's locale:${provider.locale}")
-      provider
-    case l: Locale =>
-      I18nLogger.debug(s"Using in-scope locale:${l}")
-      l
-    case _ => compiletime.error("Locale is missing, please ensure a LocaleProvider or Locale is in scope")
-  }
 
 trait LocaleProvider:
   def locale: java.util.Locale

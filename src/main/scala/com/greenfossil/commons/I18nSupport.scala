@@ -47,8 +47,8 @@ trait I18nSupport:
     * @param locale
     * @return If key is not found, returns the key
     */
-  inline def i18n(key: String, args: Any*): String =
-    bundle.i18nWithDefault(key, key, args*)(using summonLocale)
+  def i18n(key: String, args: Any*)(using localeLike: LocaleLike): String =
+    bundle.i18nWithDefault(key, key, args*)
 
   /**
     * Search of the key is based on the order or baseNames.
@@ -61,24 +61,21 @@ trait I18nSupport:
     * @param locale
     * @returnIf key is not found, returns defaultValue
     */
-  inline def i18nWithDefault(key: String, defaultValue: String, args: Any*): String =
-    bundle.i18nWithDefault(i18nMessageFn, key, defaultValue, args*)(using summonLocale)
+  def i18nWithDefault(key: String, defaultValue: String, args: Any*)(using localeLike: LocaleLike): String =
+    bundle.i18nWithDefault(i18nMessageFn, key, defaultValue, args*)
 
-  inline def i18n(keys: Seq[String], args: Any*): String =
-    val localeLike = summonLocale
-    (
-      for {
-        key <- keys
-      } yield bundle.i18nWithDefault(i18nMessageFn, key, key, args *)(using localeLike)
-      ).mkString(",")
+  def i18n(keys: Seq[String], args: Any*)(using localeLike: LocaleLike): String =
+    (for {
+      key <- keys
+    } yield bundle.i18nWithDefault(i18nMessageFn, key, key, args *)).mkString(",")
 
   /**
     * Dumps the resource bundles bases on the locale
     * @param locale
     * @return - a seq of resource bundles based on the search order of key
     */
-  inline def dumpBundles: Seq[(LocaleLike, Seq[(URL, PropertyResourceBundle)])] =
-    bundle.dumpBundles(using summonLocale)
+  def dumpBundles(using localeLike: LocaleLike): Seq[(LocaleLike, Seq[(URL, PropertyResourceBundle)])] =
+    bundle.dumpBundles
 
   /**
     * Clear bundleCache

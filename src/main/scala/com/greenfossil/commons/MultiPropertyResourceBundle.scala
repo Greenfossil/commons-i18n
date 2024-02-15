@@ -46,7 +46,7 @@ case class MultiPropertyResourceBundle(baseNames: String*):
     * @param locale
     * @return If key is not found, returns the key
     */
-  def i18n(key: String, args: Any*)(using locale: Locale): String =
+  def i18n(key: String, args: Any*)(using locale: Locale | LocaleProvider): String =
     i18nWithDefault(key, "", args *)
 
   /**
