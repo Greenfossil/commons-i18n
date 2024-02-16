@@ -17,7 +17,7 @@ class I18nMultiLangSuite extends FunSuite, I18nSupport {
     println(s"locale = ${locale}")
     val locale2 = new Locale("zh", "CN", "gf123")
     assertEquals(locale, locale2)
-//    assertNoDiff(TestI18n.i18nGetMultiLang("home.title", "ayer rajah"), "chinese home")
+    assertNoDiff(TestI18n.i18nGetMultiLang("home.title", "ayer rajah"), "chinese home")
   }
 
 }

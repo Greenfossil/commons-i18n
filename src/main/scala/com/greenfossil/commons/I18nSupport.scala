@@ -90,24 +90,32 @@ trait I18nSupport:
   def dumpBundles(using localeLike: LocaleLike): Seq[(LocaleLike, Seq[(URL, PropertyResourceBundle)])] =
     bundle.dumpBundles
 
+  /**
+   *
+   * @param variant - must be 5 to 8 characters
+   * @param langTag - e.g. en_SG
+   * @return
+   */
   def createLocaleForLang(variant: String, langTag: String): Locale =
     Option(variant).filter(_.nonEmpty).map { variant =>
       Locale.Builder().setLanguageTag(langTag).setVariant(variant).build()
     }.getOrElse(Locale.Builder().setLanguageTag(langTag).build())
 
-  def i18nGetTranslationByLang(i18nKey: String, defaultValue: String): Seq[(String, String)] =
+  def i18nGetListOfTranslationOfLangs(i18nKey: String, defaultValue: String): Seq[(String, String)] =
     val variant = DefaultConfig().getString("app.i18n.variant")
-    supportedLanguagesForMultiLang.map { lang =>
+    supportedLanguagesForMultiLang.map { langTag =>
       //Create the locale for supported lang
-      val locale = createLocaleForLang(variant, lang)
-
-      I18nLogger.debug(s"lang, value = $lang, locale:$locale  -  ${i18nWithDefault(i18nKey, if (lang == "en") defaultValue else "")(using locale)}")
-
-      lang -> i18nWithDefault(i18nKey, if (lang == "en") defaultValue else "")(using locale)
+      val locale = createLocaleForLang(variant, langTag)
+      langTag -> i18nGetTranslationOfLang(locale, langTag, i18nKey, defaultValue)
     }.filter(_._2.nonEmpty)
 
+  def i18nGetTranslationOfLang(locale: Locale, langTag: String, i18nKey: String, defaultValue: String): String =
+    val translatedValue = i18nWithDefault(i18nKey, if (langTag == "en") defaultValue else "")(using locale)
+    I18nLogger.debug(s"lang = $langTag, value = ${translatedValue}, locale = $locale")
+    translatedValue
+
   def i18nGetMultiLang(i18nKey: String, defaultValue: String): String =
-    i18nGetTranslationByLang(i18nKey, defaultValue).map(_._2).distinct.mkString(" ")
+    i18nGetListOfTranslationOfLangs(i18nKey, defaultValue).map(_._2).distinct.mkString(" ")
 
   /**
     * Clear bundleCache
