@@ -24,9 +24,18 @@ import java.util.{Locale, PropertyResourceBundle, ResourceBundle}
 
 private [commons] val I18nLogger = LoggerFactory.getLogger("com.greenfossil.commons.i18n")
 
-trait I18nSupport:
+object I18nSupport:
 
   type LocaleLike = Locale | LocaleProvider
+
+  def toLocale(localeLike: Locale | LocaleProvider): Locale =
+    localeLike match
+      case l : Locale => l
+      case p: LocaleProvider => p.locale
+
+trait I18nSupport:
+
+  export I18nSupport.LocaleLike
 
   /**
     * I18NFILENAME can be a list of basenames either comma or space separated
