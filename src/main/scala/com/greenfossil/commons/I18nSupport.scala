@@ -44,6 +44,10 @@ trait I18nSupport:
 
   lazy val bundle = MultiPropertyResourceBundle(I18NFILENAME.split("\\s*,\\s*|\\s+") *)
 
+  lazy val supportedLanguagesForMultiLang: Seq[String] =
+    import scala.jdk.CollectionConverters.*
+    DefaultConfig().getStringList("app.i18n.multi.showLang").asScala.toList
+
   def i18nMessageFn(message: String, key: String, localeLike: LocaleLike): String = message
 
   /**
@@ -85,6 +89,25 @@ trait I18nSupport:
     */
   def dumpBundles(using localeLike: LocaleLike): Seq[(LocaleLike, Seq[(URL, PropertyResourceBundle)])] =
     bundle.dumpBundles
+
+  def createLocaleForLang(variant: String, langTag: String): Locale =
+    Option(variant).filter(_.nonEmpty).map { variant =>
+      Locale.Builder().setLanguageTag(langTag).setVariant(variant).build()
+    }.getOrElse(Locale.Builder().setLanguageTag(langTag).build())
+
+  def i18nGetTranslationByLang(i18nKey: String, defaultValue: String): Seq[(String, String)] =
+    val variant = DefaultConfig().getString("app.i18n.variant")
+    supportedLanguagesForMultiLang.map { lang =>
+      //Create the locale for supported lang
+      val locale = createLocaleForLang(variant, lang)
+
+      I18nLogger.debug(s"lang, value = $lang, locale:$locale  -  ${i18nWithDefault(i18nKey, if (lang == "en") defaultValue else "")(using locale)}")
+
+      lang -> i18nWithDefault(i18nKey, if (lang == "en") defaultValue else "")(using locale)
+    }.filter(_._2.nonEmpty)
+
+  def i18nGetMultiLang(i18nKey: String, defaultValue: String): String =
+    i18nGetTranslationByLang(i18nKey, defaultValue).map(_._2).distinct.mkString(" ")
 
   /**
     * Clear bundleCache

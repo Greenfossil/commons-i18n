@@ -23,49 +23,47 @@ import java.util.Locale
   */
 class I18nLocaleProviderSuite extends munit.FunSuite  {
 
-  val obj = new I18nSupport {
+  object TestI18n extends I18nSupport {
     //File messages-test is at /test/resources folder
     override lazy val I18NFILENAME: String = "messages-test,messages-test2"
   }
-
-  import obj.*
 
 
   given LocaleProvider = new LocaleProvider {
     override def locale: Locale = Locale.getDefault
   }
   test("non existing key"){
-    assert(i18n("nokey") == "nokey")
+    assertNoDiff(TestI18n.i18n("nokey"), "nokey")
   }
 
   test("existing key") {
-    assert(i18n("home.title") == "Home Sweet Home")
+    assertNoDiff(TestI18n.i18n("home.title"), "Home Sweet Home")
   }
 
   test("with arguments"){
-    assert(i18n("files.summary", 10, "root") == "The disk root contains 10 file(s).")
+    assertNoDiff(TestI18n.i18n("files.summary", 10, "root"), "The disk root contains 10 file(s).")
   }
 
   test("single quote"){
-    assert(i18n("info.error") == "You aren't logged in!")
+    assertNoDiff(TestI18n.i18n("info.error"), "You aren't logged in!")
   }
 
   test("triple quote") {
-    assert(i18n("example.formatting") == "When using MessageFormat, '{0}' is replaced with the first parameter.")
+    assertNoDiff(TestI18n.i18n("example.formatting"), "When using MessageFormat, '{0}' is replaced with the first parameter.")
   }
 
   test("Country") {
     given LocaleProvider = new LocaleProvider {
       override def locale: Locale =  new Locale("zh", "CN")
     }
-    assert(obj.i18n("home.title") == "chinese home")
+    assertNoDiff(TestI18n.i18n("home.title"), "chinese home")
   }
 
   test("Local with variant") {
     given LocaleProvider = new LocaleProvider {
       override def locale: Locale =  new Locale("en", "SG", "gf")
     }
-    assert(obj.i18n("home.title") == "ayer rajah")
+    assertNoDiff(TestI18n.i18n("home.title"), "ayer rajah")
   }
 
   test("loop"){
@@ -74,7 +72,7 @@ class I18nLocaleProviderSuite extends munit.FunSuite  {
     }
 
     1 to 10000 foreach { i =>
-      val value = obj.i18n("home.title")
+      val value = TestI18n.i18n("home.title")
       if( i % 1000 == 0) {
         println(s"i ${i} -- $value")
       }
@@ -86,9 +84,7 @@ class I18nLocaleProviderSuite extends munit.FunSuite  {
       override def locale: Locale = Locale.CHINESE
     }
 
-//    given Locale = Locale.CHINESE
-
-    val xs = obj.dumpBundles
+    val xs = TestI18n.dumpBundles
     assertEquals(xs.size, 2)
   }
 
