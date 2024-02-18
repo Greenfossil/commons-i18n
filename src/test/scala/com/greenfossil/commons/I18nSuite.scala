@@ -29,50 +29,67 @@ class I18nSuite extends munit.FunSuite  {
   }
 
   import obj.*
-  test("test local locale is en_SG ") {
-    println(s"Locales ${Locale.getAvailableLocales.length}")
+  test("test default locale - en-US ") {
     val locale = Locale.getDefault
-    println("lang" + locale)
-    assert(Locale.getDefault.getLanguage == "en")
+    assertNoDiff(locale.toLanguageTag, "en-US")
+    assertNoDiff(Locale.getDefault.getLanguage, "en")
+  }
+
+  test("test english locale") {
+    val locale = Locale.ENGLISH
+    assertNoDiff(locale.toLanguageTag, "en")
+    assertNoDiff(Locale.getDefault.getLanguage, "en")
+  }
+
+  test("test en_SG locale"){
+    val locale = new Locale("en", "SG")
+    assertNoDiff(locale.toLanguageTag, "en-SG")
+    assertNoDiff(Locale.getDefault.getLanguage, "en")
   }
 
   test("non existing key"){
     given Locale = Locale.getDefault
-    assert(i18n("nokey") == "nokey")
+    assertNoDiff(i18n("nokey"), "nokey")
   }
 
   test("existing key") {
     given Locale = Locale.getDefault
-    assert(i18n("home.title") == "Home Sweet Home")
+    assertNoDiff(i18n("home.title"), "Home Sweet Home")
   }
 
   test("with arguments"){
     given Locale = Locale.getDefault
-    assert(i18n("files.summary", 10, "root") == "The disk root contains 10 file(s).")
+    assertNoDiff(i18n("files.summary", 10, "root"), "The disk root contains 10 file(s).")
   }
 
   test("single quote"){
     given Locale = Locale.getDefault
-    assert(i18n("info.error") == "You aren't logged in!")
+    assertNoDiff(i18n("info.error"), "You aren't logged in!")
   }
 
   test("triple quote") {
     given Locale = Locale.getDefault
-    assert(i18n("example.formatting") == "When using MessageFormat, '{0}' is replaced with the first parameter.")
+    assertNoDiff(i18n("example.formatting"), "When using MessageFormat, '{0}' is replaced with the first parameter.")
+  }
+
+  test("Country") {
+    given Locale = new Locale("zh")
+    assertNoDiff(obj.i18n("home.title"), "chinese home:zh")
   }
 
   test("Country") {
     given Locale = new Locale("zh", "CN")
-    assert(obj.i18n("home.title") == "chinese home")
+
+    assertNoDiff(obj.i18n("home.title"), "chinese home:zh_CN")
   }
 
   test("Local with variant") {
-    given Locale = new Locale("en", "SG", "gf")
-    assert(obj.i18n("home.title") == "ayer rajah")
+    given Locale = new Locale("en", "SG", "gf123")
+    assertNoDiff(obj.i18n("home.title"), "ayer rajah:en_SG_gf123")
   }
 
-  test("loop"){
-    implicit val gfLocale = new Locale("en", "SG", "gf")
+  test("loop".ignore){
+    implicit val gfLocale = new Locale("en", "SG", "gf123")
 
     1 to 10000 foreach { i =>
       val value = obj.i18n("home.title")

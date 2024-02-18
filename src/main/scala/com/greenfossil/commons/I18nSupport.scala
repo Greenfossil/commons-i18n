@@ -24,18 +24,27 @@ import java.util.{Locale, PropertyResourceBundle, ResourceBundle}
 
 private [commons] val I18nLogger = LoggerFactory.getLogger("com.greenfossil.commons.i18n")
 
+
+
 object I18nSupport:
 
   type LocaleLike = Locale | LocaleProvider
 
-  def toLocale(localeLike: Locale | LocaleProvider): Locale =
+  extension (ll: LocaleLike) def locale: Locale = toLocale(ll)
+
+  /**
+   *
+   * @param localeLike
+   * @return
+   */
+  def toLocale(localeLike: LocaleLike): Locale =
     localeLike match
       case l : Locale => l
       case p: LocaleProvider => p.locale
 
 trait I18nSupport:
 
-  export I18nSupport.LocaleLike
+  export I18nSupport.*
 
   /**
     * I18NFILENAME can be a list of basenames either comma or space separated
@@ -77,6 +86,13 @@ trait I18nSupport:
   def i18nWithDefault(key: String, defaultValue: String, args: Any*)(using localeLike: LocaleLike): String =
     bundle.i18nWithDefault(i18nMessageFn, key, defaultValue, args*)
 
+  /**
+   *
+   * @param keys
+   * @param args
+   * @param localeLike
+   * @return
+   */
   def i18n(keys: Seq[String], args: Any*)(using localeLike: LocaleLike): String =
     (for {
       key <- keys
@@ -97,25 +113,59 @@ trait I18nSupport:
    * @return
    */
   def createLocaleForLang(variant: String, langTag: String): Locale =
+    if variant.nonEmpty then
+      require(variant.length >= 5 && variant.length <= 8, s"variant [$variant] length:${variant.length}, it must be between 5 and 8")
+
     Option(variant).filter(_.nonEmpty).map { variant =>
       Locale.Builder().setLanguageTag(langTag).setVariant(variant).build()
     }.getOrElse(Locale.Builder().setLanguageTag(langTag).build())
 
-  def i18nGetListOfTranslationOfLangs(i18nKey: String, defaultValue: String): Seq[(String, String)] =
-    val variant = DefaultConfig().getString("app.i18n.variant")
-    supportedLanguagesForMultiLang.map { langTag =>
-      //Create the locale for supported lang
-      val locale = createLocaleForLang(variant, langTag)
-      langTag -> i18nGetTranslationOfLang(locale, langTag, i18nKey, defaultValue)
-    }.filter(_._2.nonEmpty)
-
-  def i18nGetTranslationOfLang(locale: Locale, langTag: String, i18nKey: String, defaultValue: String): String =
-    val translatedValue = i18nWithDefault(i18nKey, if (langTag == "en") defaultValue else "")(using locale)
-    I18nLogger.debug(s"lang = $langTag, value = ${translatedValue}, locale = $locale")
-    translatedValue
-
+  /**
+   *
+   * @param i18nKey
+   * @param defaultValue
+   * @return
+   */
   def i18nGetMultiLang(i18nKey: String, defaultValue: String): String =
     i18nGetListOfTranslationOfLangs(i18nKey, defaultValue).map(_._2).distinct.mkString(" ")
+
+  /**
+   *
+   * @param i18nKey
+   * @param defaultValue
+   * @return
+   */
+  def i18nGetListOfTranslationOfLangs(i18nKey: String, defaultValue: String): Seq[(String, String)] =
+    i18nGetListOfTranslationOfLangs(supportedLanguagesForMultiLang, i18nKey, defaultValue)
+
+  /**
+   *
+   * @param supportedLanguages
+   * @param i18nKey
+   * @param defaultValue
+   * @return (lang, i18nKey's value)
+   */
+  def i18nGetListOfTranslationOfLangs(supportedLanguages: Seq[String], i18nKey: String, defaultValue: String): Seq[(String, String)] =
+    val variant = DefaultConfig().getString("app.i18n.variant")
+    supportedLanguages.map { lang =>
+      //Create the locale for supported lang
+      val locale = createLocaleForLang(variant, lang)
+      lang -> i18nGetMultiLangOfLocale(locale, lang, i18nKey, defaultValue)
+    }.filter(_._2.nonEmpty)
+
+  /**
+   *
+   * @param locale
+   * @param lang
+   * @param i18nKey
+   * @param defaultValue
+   * @return
+   */
+  def i18nGetMultiLangOfLocale(locale: Locale, lang: String, i18nKey: String, defaultValue: String): String =
+    val translatedValue = i18nWithDefault(i18nKey, defaultValue)(using locale)
+    I18nLogger.debug(s"lang = $lang, value = ${translatedValue}, locale = $locale")
+    translatedValue
+
 
   /**
     * Clear bundleCache

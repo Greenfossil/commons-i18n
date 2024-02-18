@@ -23,6 +23,7 @@ import java.nio.file.Paths
 import java.util.{Locale, PropertyResourceBundle, ResourceBundle}
 import scala.util.{Try, Using}
 import scala.util.chaining.scalaUtilChainingOps
+import I18nSupport.LocaleLike
 
 /**
  * 
@@ -46,7 +47,7 @@ case class MultiPropertyResourceBundle(baseNames: String*):
     * @param locale
     * @return If key is not found, returns the key
     */
-  def i18n(key: String, args: Any*)(using locale: Locale | LocaleProvider): String =
+  def i18n(key: String, args: Any*)(using locale: LocaleLike): String =
     i18nWithDefault(key, "", args *)
 
   /**
@@ -60,10 +61,10 @@ case class MultiPropertyResourceBundle(baseNames: String*):
     * @param locale
     * @returnIf key is not found, returns defaultValue
     */
-  def i18nWithDefault(key: String, defaultValue: String, args: Any*)(using locale: Locale | LocaleProvider): String =
+  def i18nWithDefault(key: String, defaultValue: String, args: Any*)(using locale: LocaleLike): String =
     i18nWithDefault((msg, key, locale) => msg, key, defaultValue, args*)
 
-  def i18nWithDefault(messageFn: (String, String, Locale | LocaleProvider) => String, key: String, defaultValue: String, args: Any*)(using localeLike: Locale | LocaleProvider): String =
+  def i18nWithDefault(messageFn: (String, String, LocaleLike) => String, key: String, defaultValue: String, args: Any*)(using localeLike: LocaleLike): String =
     getBundles.flatMap { case (locale, tup2List) =>
       tup2List.flatMap {
         case (url, bundle) =>
@@ -81,7 +82,7 @@ case class MultiPropertyResourceBundle(baseNames: String*):
     * @param locale
     * @return - a seq of resource bundles based on the search order of key
     */
-  private def getBundles(using localeLike: Locale | LocaleProvider): Seq[(Locale, Seq[(URL, PropertyResourceBundle)])] =
+  private def getBundles(using localeLike: LocaleLike): Seq[(Locale, Seq[(URL, PropertyResourceBundle)])] =
     Try {
       val candidateLocales = localeLike match
         case locale: Locale => control.getCandidateLocales("", locale).asScala
@@ -130,7 +131,7 @@ case class MultiPropertyResourceBundle(baseNames: String*):
     * @param localeLike
     * @return - a seq of resource bundles based on the search order of key
     */
-  def dumpBundles(using localeLike: Locale | LocaleProvider): Seq[(Locale, Seq[(URL, PropertyResourceBundle)])] = {
+  def dumpBundles(using localeLike: LocaleLike): Seq[(Locale, Seq[(URL, PropertyResourceBundle)])] = {
     val bundles = getBundles
     bundles.foreach {
       case (l, xs) =>
