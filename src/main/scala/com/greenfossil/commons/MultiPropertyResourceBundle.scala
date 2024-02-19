@@ -71,6 +71,7 @@ case class MultiPropertyResourceBundle(baseNames: String*):
           Try {
             val resourceBundleMessage = bundle.getString(key)
             val message = messageFn(resourceBundleMessage, key, localeLike)
+            I18nLogger.trace(s"key = ${key} - locale = ${locale} - resourceBundleMessage = ${resourceBundleMessage} - message = ${message}")
             new java.text.MessageFormat(message, locale).format(args.toArray)
           }.toOption.tap { opt =>
             I18nLogger.debug(s"path:${url.getPath} - key/value $key:$opt")

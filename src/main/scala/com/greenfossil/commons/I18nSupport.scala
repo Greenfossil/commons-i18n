@@ -70,7 +70,7 @@ trait I18nSupport:
     * @return If key is not found, returns the key
     */
   def i18n(key: String, args: Any*)(using localeLike: LocaleLike): String =
-    bundle.i18nWithDefault(key, key, args*)
+    i18nWithDefault(key, key, args*)
 
   /**
     * Search of the key is based on the order or baseNames.
@@ -110,7 +110,7 @@ trait I18nSupport:
    *
    * @param variant - must be 5 to 8 characters
    * @param langTag - e.g. en_SG
-   * @return
+   * @return locale
    */
   def createLocaleForLang(variant: String, langTag: String): Locale =
     if variant.nonEmpty then
@@ -124,10 +124,43 @@ trait I18nSupport:
    *
    * @param i18nKey
    * @param defaultValue
-   * @return
+   * @return if multiple languages are found, concatenates them with a space
    */
   def i18nGetMultiLang(i18nKey: String, defaultValue: String): String =
-    i18nGetListOfTranslationOfLangs(i18nKey, defaultValue).map(_._2).distinct.mkString(" ")
+    i18nGetMultiLang(i18nKey, defaultValue, " ")
+
+  /**
+   *
+   * @param i18nKey
+   * @param defaultValue
+   * @param separator
+   * @return if multiple languages are found, concatenates them with indicated separator
+   */
+  def i18nGetMultiLang(i18nKey: String, defaultValue: String, separator : String): String =
+    i18nGetListOfTranslationOfLangs(i18nKey, defaultValue).map(_._2).distinct.mkString(separator)
+
+  /**
+   *
+   * @param supportedLanguages - e.g. Seq("en", "zh")
+   * @param i18nKey
+   * @param defaultValue
+   * @return if multiple languages are found, concatenates them with a space
+   */
+  def i18nGetMultiLang(supportedLanguages: Seq[String], i18nKey: String, defaultValue: String): String =
+    i18nGetMultiLang(supportedLanguages, i18nKey, defaultValue, " ")
+
+  /**
+   *
+   * @param supportedLanguages - e.g. Seq("en", "zh")
+   * @param i18nKey
+   * @param defaultValue
+   * @param separator
+   * @return if multiple languages are found, concatenates them with indicated separator
+   */
+  def i18nGetMultiLang(supportedLanguages: Seq[String], i18nKey: String, defaultValue: String, separator: String): String =
+    i18nGetListOfTranslationOfLangs(supportedLanguages, i18nKey, defaultValue).map(_._2).distinct.mkString(separator)
+
+
 
   /**
    *
@@ -140,7 +173,7 @@ trait I18nSupport:
 
   /**
    *
-   * @param supportedLanguages
+   * @param supportedLanguages - e.g. Seq("en", "zh")
    * @param i18nKey
    * @param defaultValue
    * @return (lang, i18nKey's value)

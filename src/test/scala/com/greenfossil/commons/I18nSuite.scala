@@ -29,11 +29,6 @@ class I18nSuite extends munit.FunSuite  {
   }
 
   import obj.*
-  test("test default locale - en-US ") {
-    val locale = Locale.getDefault
-    assertNoDiff(locale.toLanguageTag, "en-US")
-    assertNoDiff(Locale.getDefault.getLanguage, "en")
-  }
 
   test("test english locale") {
     val locale = Locale.ENGLISH
@@ -48,27 +43,27 @@ class I18nSuite extends munit.FunSuite  {
   }
 
   test("non existing key"){
-    given Locale = Locale.getDefault
+    given Locale = Locale.ENGLISH
     assertNoDiff(i18n("nokey"), "nokey")
   }
 
   test("existing key") {
-    given Locale = Locale.getDefault
+    given Locale = Locale.ENGLISH
     assertNoDiff(i18n("home.title"), "Home Sweet Home")
   }
 
   test("with arguments"){
-    given Locale = Locale.getDefault
+    given Locale = Locale.ENGLISH
     assertNoDiff(i18n("files.summary", 10, "root"), "The disk root contains 10 file(s).")
   }
 
   test("single quote"){
-    given Locale = Locale.getDefault
+    given Locale = Locale.ENGLISH
     assertNoDiff(i18n("info.error"), "You aren't logged in!")
   }
 
   test("triple quote") {
-    given Locale = Locale.getDefault
+    given Locale = Locale.ENGLISH
     assertNoDiff(i18n("example.formatting"), "When using MessageFormat, '{0}' is replaced with the first parameter.")
   }
 

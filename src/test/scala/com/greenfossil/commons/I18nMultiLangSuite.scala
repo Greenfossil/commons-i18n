@@ -26,9 +26,15 @@ class I18nMultiLangSuite extends FunSuite, I18nSupport {
     assertEquals(TestI18n.i18nGetListOfTranslationOfLangs(Seq("en","zh"),  "home.title", "default home"), Seq(("en", "Home Sweet Home"), ("zh", "chinese home:zh")))
   }
 
-  test("i18nGetMultiLang".fail) {
-    //Check that application.conf is set properly, then confirm the expectation - 'Home Sweet Home' or 'chinese home:zh'
-    assertNoDiff(TestI18n.i18nGetMultiLang( "home.title", "ayer rajah"), "") //What is the expectation
+  test("i18nGetMultiLang") {
+    assertNoDiff(TestI18n.i18nGetMultiLang("home.title", "default home"), "Home Sweet Home chinese home:zh")
+    assertNoDiff(TestI18n.i18nGetMultiLang(Seq("en"), "home.title", "default home"), "Home Sweet Home")
+    assertNoDiff(TestI18n.i18nGetMultiLang(Seq("zh"), "home.title", "default home"), "chinese home:zh")
   }
 
+  test("i18nGetMultiLang with default values") {
+    assertNoDiff(TestI18n.i18nGetMultiLang("food.english", "Default English"), "english food")
+    assertNoDiff(TestI18n.i18nGetMultiLang("food.chinese", "Default English"), "Default English chinese food:zh")
+    assertNoDiff(TestI18n.i18nGetMultiLang("food.notFound", "Default English"), "Default English")
+  }
 }

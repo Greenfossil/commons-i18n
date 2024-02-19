@@ -18,11 +18,11 @@
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%date - %logger{15} - %message%n%xException{5}</pattern>
+            <pattern>%date - %level - %logger{15} - %message%n%xException{5}</pattern>
         </encoder>
     </appender>
 
-    <logger name="com.greenfossil.commons.i18n" level="debug"/>
+    <logger name="com.greenfossil.commons.i18n" level="trace"/>
 
   <root level="INFO">
         <appender-ref ref="STDOUT"/>

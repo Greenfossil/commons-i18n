@@ -30,7 +30,7 @@ class I18nLocaleProviderSuite extends munit.FunSuite  {
 
 
   given LocaleProvider = new LocaleProvider {
-    override def locale: Locale = Locale.getDefault
+    override def locale: Locale = Locale.ENGLISH
   }
   test("non existing key"){
     assertNoDiff(TestI18n.i18n("nokey"), "nokey")
