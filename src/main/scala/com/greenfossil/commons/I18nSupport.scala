@@ -53,6 +53,11 @@ trait I18nSupport:
 
   lazy val bundle = MultiPropertyResourceBundle(I18NFILENAME.split("\\s*,\\s*|\\s+") *)
 
+  /**
+    * Set the I18n result to be show in multiple languages by default
+    */
+  lazy val multiLangEnabled: Boolean = DefaultConfig().getBoolean("app.i18n.multi.enabled")
+
   lazy val supportedLanguagesForMultiLang: Seq[String] =
     import scala.jdk.CollectionConverters.*
     DefaultConfig().getStringList("app.i18n.multi.showLang").asScala.toList
@@ -84,7 +89,8 @@ trait I18nSupport:
     * @returnIf key is not found, returns defaultValue
     */
   def i18nWithDefault(key: String, defaultValue: String, args: Any*)(using localeLike: LocaleLike): String =
-    bundle.i18nWithDefault(i18nMessageFn, key, defaultValue, args*)
+    if multiLangEnabled then i18nGetMultiLang(key, defaultValue, " ", args*)
+    else bundle.i18nWithDefault(i18nMessageFn, key, defaultValue, args*)
 
   /**
    *
@@ -136,8 +142,8 @@ trait I18nSupport:
    * @param separator
    * @return if multiple languages are found, concatenates them with indicated separator
    */
-  def i18nGetMultiLang(i18nKey: String, defaultValue: String, separator : String): String =
-    i18nGetListOfTranslationOfLangs(i18nKey, defaultValue).map(_._2).distinct.mkString(separator)
+  def i18nGetMultiLang(i18nKey: String, defaultValue: String, separator: String, args: Any*): String =
+    i18nGetListOfTranslationOfLangs(i18nKey, defaultValue, args*).map(_._2).distinct.mkString(separator)
 
   /**
    *
@@ -157,8 +163,8 @@ trait I18nSupport:
    * @param separator
    * @return if multiple languages are found, concatenates them with indicated separator
    */
-  def i18nGetMultiLang(supportedLanguages: Seq[String], i18nKey: String, defaultValue: String, separator: String): String =
-    i18nGetListOfTranslationOfLangs(supportedLanguages, i18nKey, defaultValue).map(_._2).distinct.mkString(separator)
+  def i18nGetMultiLang(supportedLanguages: Seq[String], i18nKey: String, defaultValue: String, separator: String, args: Any*): String =
+    i18nGetListOfTranslationOfLangs(supportedLanguages, i18nKey, defaultValue, args*).map(_._2).distinct.mkString(separator)
 
 
 
@@ -168,8 +174,8 @@ trait I18nSupport:
    * @param defaultValue
    * @return
    */
-  def i18nGetListOfTranslationOfLangs(i18nKey: String, defaultValue: String): Seq[(String, String)] =
-    i18nGetListOfTranslationOfLangs(supportedLanguagesForMultiLang, i18nKey, defaultValue)
+  def i18nGetListOfTranslationOfLangs(i18nKey: String, defaultValue: String, args: Any*): Seq[(String, String)] =
+    i18nGetListOfTranslationOfLangs(supportedLanguagesForMultiLang, i18nKey, defaultValue, args*)
 
   /**
    *
@@ -178,12 +184,12 @@ trait I18nSupport:
    * @param defaultValue
    * @return (lang, i18nKey's value)
    */
-  def i18nGetListOfTranslationOfLangs(supportedLanguages: Seq[String], i18nKey: String, defaultValue: String): Seq[(String, String)] =
+  def i18nGetListOfTranslationOfLangs(supportedLanguages: Seq[String], i18nKey: String, defaultValue: String, args: Any*): Seq[(String, String)] =
     val variant = DefaultConfig().getString("app.i18n.variant")
     supportedLanguages.map { lang =>
       //Create the locale for supported lang
       val locale = createLocaleForLang(variant, lang)
-      lang -> i18nGetMultiLangOfLocale(locale, lang, i18nKey, defaultValue)
+      lang -> i18nGetMultiLangOfLocale(locale, lang, i18nKey, defaultValue, args*)
     }.filter(_._2.nonEmpty)
 
   /**
@@ -194,8 +200,8 @@ trait I18nSupport:
    * @param defaultValue
    * @return
    */
-  def i18nGetMultiLangOfLocale(locale: Locale, lang: String, i18nKey: String, defaultValue: String): String =
-    val translatedValue = i18nWithDefault(i18nKey, defaultValue)(using locale)
+  def i18nGetMultiLangOfLocale(locale: Locale, lang: String, i18nKey: String, defaultValue: String, args: Any*): String =
+    val translatedValue = bundle.i18nWithDefault(i18nMessageFn, i18nKey, defaultValue, args*)(using locale)
     I18nLogger.debug(s"lang = $lang, value = ${translatedValue}, locale = $locale")
     translatedValue
 
