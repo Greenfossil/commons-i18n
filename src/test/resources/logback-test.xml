@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<configuration debug="true">
+<configuration debug="false">
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -22,9 +22,9 @@
         </encoder>
     </appender>
 
-    <logger name="com.greenfossil.commons.i18n" level="trace"/>
+    <logger name="com.greenfossil.commons.i18n" level="off"/>
 
-  <root level="INFO">
+  <root level="off">
         <appender-ref ref="STDOUT"/>
     </root>
 
