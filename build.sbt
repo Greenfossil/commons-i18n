@@ -2,7 +2,7 @@ name := "commons-i18n"
 
 organization := "com.greenfossil"
 
-version := "1.0.10"
+version := "1.0.11"
 
 scalaVersion := "3.3.3"
 
@@ -22,6 +22,14 @@ val javaLibraries = Seq(
  * https://github.com/scala/scala-module-dependency-sample
  */
 libraryDependencies ++= javaLibraries ++ Seq(
-  "com.greenfossil" %% "typesafe-config-ext" % "1.0.3",
-  "org.scalameta" %% "munit" % "0.7.29" % Test,
+  "com.greenfossil" %% "typesafe-config-ext" % "1.0.4",
+  "org.scalameta" %% "munit" % "1.0.0" % Test,
 )
+
+//https://www.scala-sbt.org/1.x/docs/Publishing.html
+ThisBuild / versionScheme := Some("early-semver")
+
+//Remove logback from test jar
+Test / packageBin / mappings ~= {
+  _.filterNot(_._1.getName.startsWith("logback"))
+}
