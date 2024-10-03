@@ -2,7 +2,7 @@ name := "commons-i18n"
 
 organization := "com.greenfossil"
 
-version := "1.1.0-RC1"
+version := "1.1.0"
 
 scalaVersion := "3.5.0"
 
@@ -22,7 +22,7 @@ val javaLibraries = Seq(
  * https://github.com/scala/scala-module-dependency-sample
  */
 libraryDependencies ++= javaLibraries ++ Seq(
-  "com.greenfossil" %% "typesafe-config-ext" % "1.1.0-RC1",
+  "com.greenfossil" %% "typesafe-config-ext" % "1.1.0",
   "org.scalameta" %% "munit" % "1.0.0" % Test,
 )
 
