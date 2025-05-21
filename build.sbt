@@ -2,14 +2,11 @@ name := "commons-i18n"
 
 organization := "com.greenfossil"
 
-version := "1.2.0"
+version := "1.3.0-RC1"
 
-scalaVersion := "3.6.3"
+scalaVersion := "3.7.0"
 
 scalacOptions ++= Seq("-unchecked", "-feature", "-deprecation")
-
-Compile / javacOptions ++= Seq("-source", "17")
-
 
 lazy val commonsI18n = project in file(".")
 
@@ -22,8 +19,8 @@ val javaLibraries = Seq(
  * https://github.com/scala/scala-module-dependency-sample
  */
 libraryDependencies ++= javaLibraries ++ Seq(
-  "com.greenfossil" %% "typesafe-config-ext" % "1.2.0",
-  "org.scalameta" %% "munit" % "1.0.0" % Test,
+  "com.greenfossil" %% "typesafe-config-ext" % "1.3.0-RC3",
+  "org.scalameta" %% "munit" % "1.1.1" % Test,
 )
 
 //https://www.scala-sbt.org/1.x/docs/Publishing.html
