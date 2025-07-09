@@ -14,7 +14,7 @@ class I18nMultiLangSuite extends FunSuite, I18nSupport {
 
   test("i18nGetMultiLangOfLocale"){
     val locale = TestI18n.createLocaleForLang(variant = "gf123", langTag = "zh-CN")
-    val locale2 = new Locale("zh", "CN", "gf123")
+    val locale2 = Locale.of("zh", "CN", "gf123")
     assertEquals(locale, locale2)
     assertNoDiff(TestI18n.i18nGetMultiLangOfLocale(locale, "zh", "home.title", "default home"), "chinese home:zh_CN_gf123")
     assertNoDiff(TestI18n.i18nGetMultiLangOfLocale(locale2, "zh", "home.title", "default home"), "chinese home:zh_CN_gf123")

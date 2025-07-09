@@ -26,18 +26,18 @@ class LocaleUtilSuite extends FunSuite{
 
   test("Get best match"){
     val acceptedLanguages = LanguageRange.parse("en-SG;q=1.0,zh-CN;q=0.5,fr-CA;q=0.0").asScala.toList
-    val availableLanguages = Seq("zh", "en", "kr").map(x => new Locale(x))
+    val availableLanguages = Seq("zh", "en", "kr").map(x => Locale.of(x))
 
     val bestMatch = LocaleUtil.getBestMatchLocale(acceptedLanguages, availableLanguages, None)
-    assertEquals(bestMatch, new Locale("en"))
+    assertEquals(bestMatch, Locale.of("en"))
   }
 
   test("Get best match with variant"){
     val acceptedLanguages = LanguageRange.parse("en-SG;q=1.0,zh-CN;q=0.5,fr-CA;q=0.0").asScala.toList
-    val availableLanguages = Seq("zh", "en", "kr").map(x => new Locale(x))
+    val availableLanguages = Seq("zh", "en", "kr").map(x => Locale.of(x))
 
     val bestMatch = LocaleUtil.getBestMatchLocale(acceptedLanguages, availableLanguages, Some("elemx"))
-    assertEquals(bestMatch, new Locale("en", "", "elemx"))
+    assertEquals(bestMatch, Locale.of("en", "", "elemx"))
   }
 
   test("Get best match with region variant"){
@@ -45,7 +45,7 @@ class LocaleUtilSuite extends FunSuite{
     val availableLanguageTags = Seq("zh-CN", "en-SG")
 
     val bestMatch = LocaleUtil.getBestMatchFromLanguageTags(acceptedLanguages, availableLanguageTags, Some("elemx"))
-    assertEquals(bestMatch, new Locale("en", "SG", "elemx"))
+    assertEquals(bestMatch, Locale.of("en", "SG", "elemx"))
   }
 
   test("Get best match where language tag has no match with available languages") {
@@ -53,7 +53,7 @@ class LocaleUtilSuite extends FunSuite{
     val availableLanguageTags = Seq("en-SG")
 
     val bestMatch = LocaleUtil.getBestMatchFromLanguageTags(acceptedLanguages, availableLanguageTags, Some("elemx"))
-    assertEquals(bestMatch, new Locale("en", "SG", "elemx"))
+    assertEquals(bestMatch, Locale.of("en", "SG", "elemx"))
   }
 
 }

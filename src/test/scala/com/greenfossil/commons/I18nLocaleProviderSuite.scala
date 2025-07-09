@@ -54,21 +54,21 @@ class I18nLocaleProviderSuite extends munit.FunSuite  {
 
   test("Country") {
     given LocaleProvider = new LocaleProvider {
-      override def locale: Locale =  new Locale("zh", "CN")
+      override def locale: Locale = Locale.of("zh", "CN")
     }
     assertNoDiff(TestI18n.i18n("home.title"), "chinese home:zh_CN")
   }
 
   test("Local with variant") {
     given LocaleProvider = new LocaleProvider {
-      override def locale: Locale =  new Locale("en", "SG", "gf123")
+      override def locale: Locale = Locale.of("en", "SG", "gf123")
     }
     assertNoDiff(TestI18n.i18n("home.title"), "ayer rajah:en_SG_gf123")
   }
 
   test("loop".ignore){
     given LocaleProvider = new LocaleProvider {
-      override def locale: Locale = new Locale("en", "SG", "gf123")
+      override def locale: Locale = Locale.of("en", "SG", "gf123")
     }
 
     1 to 10000 foreach { i =>

@@ -2,9 +2,9 @@ name := "commons-i18n"
 
 organization := "com.greenfossil"
 
-version := "1.3.0-RC1"
+version := "1.3.0"
 
-scalaVersion := "3.7.0"
+scalaVersion := "3.7.1"
 
 scalacOptions ++= Seq("-unchecked", "-feature", "-deprecation")
 
@@ -19,7 +19,7 @@ val javaLibraries = Seq(
  * https://github.com/scala/scala-module-dependency-sample
  */
 libraryDependencies ++= javaLibraries ++ Seq(
-  "com.greenfossil" %% "typesafe-config-ext" % "1.3.0-RC3",
+  "com.greenfossil" %% "typesafe-config-ext" % "1.3.0",
   "org.scalameta" %% "munit" % "1.1.1" % Test,
 )
 

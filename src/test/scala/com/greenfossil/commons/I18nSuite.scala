@@ -37,7 +37,7 @@ class I18nSuite extends munit.FunSuite  {
   }
 
   test("test en_SG locale"){
-    val locale = new Locale("en", "SG")
+    val locale = Locale.of("en", "SG")
     assertNoDiff(locale.toLanguageTag, "en-SG")
     assertNoDiff(Locale.getDefault.getLanguage, "en")
   }
@@ -68,23 +68,23 @@ class I18nSuite extends munit.FunSuite  {
   }
 
   test("Country") {
-    given Locale = new Locale("zh")
+    given Locale = Locale.of("zh")
     assertNoDiff(obj.i18n("home.title"), "chinese home:zh")
   }
 
   test("Country") {
-    given Locale = new Locale("zh", "CN")
+    given Locale = Locale.of("zh", "CN")
 
     assertNoDiff(obj.i18n("home.title"), "chinese home:zh_CN")
   }
 
   test("Local with variant") {
-    given Locale = new Locale("en", "SG", "gf123")
+    given Locale = Locale.of("en", "SG", "gf123")
     assertNoDiff(obj.i18n("home.title"), "ayer rajah:en_SG_gf123")
   }
 
   test("loop".ignore){
-    implicit val gfLocale = new Locale("en", "SG", "gf123")
+    implicit val gfLocale = Locale.of("en", "SG", "gf123")
 
     1 to 10000 foreach { i =>
       val value = obj.i18n("home.title")
